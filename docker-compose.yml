@@ -1,0 +1,36 @@
+version: '3'
+services:
+  repsol_db:
+    image: postgres:15
+    container_name: ${POSTGRES_DB}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:${HOST_PORT}:${GUEST_PORT}"
+    volumes:
+      - "./init:/docker-entrypoint-initdb.d/"
+    networks:
+      network:
+        aliases:
+          - db
+  
+  repsol_bot:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    container_name: ${BOT_NAME}
+    depends_on:
+      - ${POSTGRES_DB
+    networks:
+      network:
+        aliases:
+          - bot
+          
+    volumes:
+      - "./:/app/"
+
+networks:
+  network:
+    driver: bridge
